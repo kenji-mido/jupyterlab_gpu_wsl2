@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+    jupyterlab-gpu-tmp:
+        build: .
+        stdin_open: true
+        tty: true
+        container_name: jupyterlab-gpu-tmp
+        volumes:
+            - ./code:/code
+            - ./python/root_jupyter:/root/.jupyter
+            - ./workspace:/workspace
+        expose:
+            - "8888"
+        ports:
+            - "8888:8888"
+        runtime: nvidia
+        restart: always
+        entrypoint: >
+          jupyter-lab --allow-root --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token='' --notebook-dir=/workspace
+        deploy:
+          resources:
+            reservations:
+              devices:
+                - driver: nvidia
+                  count: all
+                  capabilities: [gpu]
+        shm_size: '8g'
+        privileged: true
